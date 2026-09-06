@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SERPAPI_KEY=${SERPAPI_KEY}
+      - BLOCKCHAIN_RPC_URL=${BLOCKCHAIN_RPC_URL:-http://blockchain:8545}
+      - BLOCKCHAIN_PRIVATE_KEY=${BLOCKCHAIN_PRIVATE_KEY}
+      - CONTRACT_ADDRESS=${CONTRACT_ADDRESS}
+      - BLOCKCHAIN_CHAIN_ID=${BLOCKCHAIN_CHAIN_ID:-11155111}
+      - SEARCH_PROVIDER=${SEARCH_PROVIDER:-serpapi}
+      - DEMO_MODE=${DEMO_MODE:-false}
+      - ARTIFACTS_DIR=artifacts
+    ports:
+      - "8503:8503"   # Streamlit UI
+      - "8000:8000"   # FastAPI backend
+    volumes:
+      - ./images:/app/images
+      - ./artifacts:/app/artifacts
+      - ./demo:/app/demo
+    depends_on:
+      - blockchain
+    command: streamlit run app/ui.py --server.port 8503
+
+  blockchain:
+    image: nomicfoundation/hardhat-node:latest
+    ports:
+      - "8545:8545"
+    environment:
+      - HARDHAT_NETWORK_ID=11155111
+    command: npx hardhat node --hostname 0.0.0.0
+
+  deployer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - BLOCKCHAIN_RPC_URL=http://blockchain:8545
+      - BLOCKCHAIN_PRIVATE_KEY=${BLOCKCHAIN_PRIVATE_KEY}
+      - BLOCKCHAIN_CHAIN_ID=${BLOCKCHAIN_CHAIN_ID:-11155111}
+    depends_on:
+      - blockchain
+    command: python scripts/deploy_contract.py
+    profiles:
+      - deploy
+
+volumes:
+  blockchain-data:

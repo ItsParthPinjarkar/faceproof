@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: faceproof-api
+    runtime: python
+    buildCommand: bash build.sh
+    startCommand: gunicorn api_server:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: BLOCKCHAIN_RPC_URL
+        sync: false
+      - key: BLOCKCHAIN_PRIVATE_KEY
+        sync: false
+      - key: CONTRACT_ADDRESS
+        sync: false
+      - key: BLOCKCHAIN_CHAIN_ID
+        value: "11155111"
+      - key: SERPAPI_KEY
+        sync: false
+      - key: DEMO_MODE
+        value: "true"
+      - key: SEARCH_PROVIDER
+        value: "demo"
+      - key: PYTHON_VERSION
+        value: "3.12.10"
