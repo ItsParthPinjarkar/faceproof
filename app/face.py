@@ -2,7 +2,6 @@ import os
 import logging
 import cv2
 import numpy as np
-import insightface
 import hashlib
 import json
 from typing import List, Optional, Dict, Any
@@ -28,6 +27,7 @@ class FaceEngine:
         if self._initialized:
             return
         try:
+            import insightface
             logger.info(f"Loading InsightFace model: {self.model_name}")
             self.app = insightface.app.FaceAnalysis(
                 name=self.model_name,
