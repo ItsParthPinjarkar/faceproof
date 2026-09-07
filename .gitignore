@@ -29,7 +29,6 @@ pip-log.txt
 docker-compose.override.yml
 deployments/
 artifacts/
-demo/*.jpg
 demo/*.json
 *.mp4
 *.webm
